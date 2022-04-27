@@ -1,15 +1,85 @@
 /* eslint-disable @next/next/link-passhref */
 import { PrismaClient } from '@prisma/client'
 import { GetServerSideProps } from 'next'
-import Link from 'next/link'
-import * as React from 'react'
+
+import React, { useState, useEffect } from 'react'
 
 export default function Home({ notes }: any) {
-  console.log(notes)
+  const [title, setTitle] = useState('')
+  const [content, setContent] = useState('')
+  const [meta, setMeta] = useState('')
+  const [newData, setNewData] = useState(null)
+  const [notesData, setNotesData] = useState(notes)
+  const GetData = async () => {
+    try {
+      const response = await fetch('/api/note', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      })
+      setNewData(await response.json())
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const handelSubmit = async (e: any) => {
+    e.preventDefault()
+    const body = { title, content, meta }
+    try {
+      const response = await fetch('/api/note', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      })
+      if (response.status !== 200) {
+        console.log('something went wrong')
+      } else {
+        // resetForm()
+        console.log('success')
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  useEffect(() => {
+    setNotesData(newData)
+  }, [newData])
+  console.log('first', '2')
   return (
     <div className="bg-black text-white min-h-screen">
       <div className="">Heelo</div>
-      <button type="submit"> Submit</button>
+      <input
+        type="text"
+        placeholder="Title"
+        className="py-1 px-5 border-white border bg-transparent"
+        onChange={(e) => setTitle(e.target.value)}
+      />{' '}
+      <input
+        type="content"
+        placeholder="Content"
+        className="py-1 px-5 border-white border bg-transparent"
+        onChange={(e) => setContent(e.target.value)}
+      />{' '}
+      <input
+        type="meta"
+        placeholder="Meta"
+        className="py-1 px-5 border-white border bg-transparent"
+        onChange={(e) => setMeta(e.target.value)}
+      />
+      <button type="submit" onClick={handelSubmit}>
+        {' '}
+        Submit
+      </button>
+      {notesData?.map(
+        (n: { title: string; content: string }, index: number) => {
+          return (
+            <div key={index}>
+              <h1>{n.title}</h1>{' '}
+            </div>
+          )
+        },
+      )}
     </div>
   )
 }
