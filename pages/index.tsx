@@ -43,8 +43,8 @@ export default function Home({ notes }: any) {
   }
 
   useEffect(() => {
-    setNotesData(newData)
-  }, [newData])
+    setNotesData(notes)
+  }, [notes])
   console.log('first', '2')
   return (
     <div className="bg-black text-white min-h-screen">
